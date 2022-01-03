@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
+import 'models/transaction.dart';
+import 'ui/transaction_page.dart';
+
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
-  await Hive.openBox('settings');
+  Hive.registerAdapter(TransactionAdapter());
+  await Hive.openBox<Transaction>('transactions');
   runApp(const MyApp());
 }
 
@@ -12,23 +17,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       title: 'Demo Settings',
-      home: Scaffold(
-        body: ValueListenableBuilder<Box>(
-          valueListenable: Hive.box('settings').listenable(keys: ['darkMode']),
-          builder: (context, box, widget) {
-            return Center(
-              child: Switch(
-                value: box.get('darkMode', defaultValue: false),
-                onChanged: (val) {
-                  box.put('darkMode', val);
-                },
-              ),
-            );
-          },
-        ),
-      ),
+      home: TransactionPage(),
     );
   }
 }
